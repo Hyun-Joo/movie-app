@@ -8,6 +8,11 @@ const routes = [
       component: MainList
    },
    {
+     path: '/movies',
+     name: 'MovieList',
+     component: import(/* webpackChunkName: "movies" */ '@/views/MovieList')
+   },
+   {
       path: '/detail',
       name: 'MovieDetail',
       component: import(/* webpackChunkName: "detail" */ '@/views/MovieDetail')

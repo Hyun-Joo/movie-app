@@ -2,10 +2,10 @@
   <div class="cont-area">
     <div class="tab-sorting">
       <button type="button" class="on" id="btnSort">박스오피스</button>
-      <a href="javascript:void(0)" class="more-movie" title="더 많은 영화보기">
+      <router-link to="/movies" href="javascript:void(0)" class="more-movie" title="더 많은 영화보기">
         더 많은 영화보기
         <i class="iconset ico-more-corss gray"></i>
-      </a>
+      </router-link>
     </div>
     <div class="main-movie-list">
       <ol class="list">
@@ -52,7 +52,12 @@
               {{movie.vote_count}}
             </button>
             <div class="case">
-              <a href="javascript:void(0)" class="button gblue" title="보기">상세보기</a>
+              <a href="javascript:void(0)"
+                 class="button gblue"
+                 title="보기"
+                 @click="goDetail(movie.id)">
+                상세보기
+              </a>
             </div>
           </div>
         </li>
@@ -252,8 +257,13 @@ export default {
   text-decoration: none;
 }
 .main-movie-list > ol li .movie-list-info .wrap .summary {
+  display: -webkit-box;
   overflow: hidden;
-  height: 152px;
+  height: 180px;
+  -webkit-line-clamp: 8;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /*text-overflow: ellipsis;*/
 }
 @keyframes fadein {
   from {
