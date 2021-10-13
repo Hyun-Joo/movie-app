@@ -4,16 +4,22 @@ import fetch from '@/utils/fetch';
 const store = createStore({
    state() {
       return {
-         movieList: []
+         movieList: [],
+         movieInfo: {}
       }
    },
    mutations: {
       movieList(state, payload) {
          state.movieList = payload;
+      },
+      movieDetail(state, payload) {
+         state.movieInfo = payload;
       }
    },
    getters: {
-
+      imgPath() {
+         return `${process.env.VUE_APP_IMG_PATH}`;
+      }
    },
    actions: {
       async fn_getMovieList({commit}) {
@@ -28,6 +34,16 @@ const store = createStore({
                }
             }
          );
+      },
+      async fn_getMovieDetail({ commit }, id) {
+         await fetch.get(
+            `${process.env.VUE_APP_API_URL}/${id}?api_key=${process.env.VUE_APP_API_KEY}&language=ko-KR`,
+            (status, data) => {
+               if(status === 200 && Object.keys(data).length) {
+                  commit('movieDetail', data);
+               }
+            }
+         )
       }
    }
 });
