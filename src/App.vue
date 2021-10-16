@@ -13,6 +13,9 @@ export default {
   components: {
     Background,
     MainList
+  },
+  created() {
+    this.$store.dispatch('fn_getMovieList');
   }
 }
 </script>
@@ -153,5 +156,20 @@ a.button {
   line-height: 36px;
   border: 0;
   background: #037b94;
+}
+
+.btn-group {
+  padding: 20px 0 30px 0;
+  margin: 0;
+  text-align: center;
+}
+.btn-group .button {
+  margin: 0 3px;
+}
+.button.purple {
+  color: #fff;
+  line-height: 36px;
+  border: 0;
+  background: #503396;
 }
 </style>

@@ -97,7 +97,7 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('fn_getMovieList');
+    // this.$store.dispatch('fn_getMovieList');
   },
   mounted() {
   },

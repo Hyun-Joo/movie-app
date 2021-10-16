@@ -18,6 +18,26 @@
                 {{movieInfo.vote_count}}
               </span>
             </button>
+            <div class="sns-share">
+              <a
+                href="javascript:void(0)"
+                class="btn btn-common-share"
+                title="공유하기"
+                @click="shareLink"
+              >
+                <i class="iconset ico-sns-line"></i>
+                공유하기
+              </a>
+<!--              <div class="btn-sns-share-wrap">-->
+<!--                <div class="cont-area">-->
+<!--                  <div class="btn-sns-share-group">-->
+<!--                    <button type="button" class="btn btnSns link" title="링크 공유하기">-->
+<!--                      링크공유-->
+<!--                    </button>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+            </div>
           </div>
 
           <div class="info">
@@ -29,6 +49,13 @@
                   <span class="ir">점</span>
                 </p>
               </div>
+            </div>
+            <div class="rate">
+              <p class="tit">예매율</p>
+              <p class="cont">
+                <em>{{ranking}}</em>
+                위 ({{popularRate}}%)
+              </p>
             </div>
           </div>
 
@@ -44,29 +71,62 @@
       </div>
     </div>
   </div>
+  <common-alert v-if="isShow"></common-alert>
 </template>
 
 <script>
 import {mapState, mapGetters} from 'vuex';
+import useClipboard from 'vue-clipboard3';
+import CommonAlert from "@/components/CommonAlert";
 
 export default {
   name: 'MovieDetail',
+  components: {CommonAlert},
   computed: {
-    ...mapGetters(['imgPath']),
-    ...mapState(['movieInfo']),
+    ...mapGetters(['imgPath', 'popularityAccumulator']),
+    ...mapState(['movieInfo', 'movieList']),
+    ranking() {
+      return this.movieList.findIndex(movie => movie.id === this.movieInfo.id) + 1;
+    },
+    popularRate() {
+      return Math.round((this.movieInfo.popularity / this.popularityAccumulator) * 100 * 10) / 10.0;
+    }
+  },
+  data() {
+    return {
+      isShow: false
+    }
   },
   created() {
     this.$store.dispatch('fn_getMovieDetail', this.$route.query.id);
   },
+  mounted() {
+  },
   methods: {
     downloadPoster(e) {
-      // console.log(e.target.href)
-      // e.target.src = `${this.imgPath}/${this.movieInfo.poster_path}`;
-      // e.target.download = `${this.movieInfo.original_title}`;
-      // e.target.click();
       const win = window.open(`${this.imgPath}/${this.movieInfo.poster_path}`);
       win.document.execCommand('SaveAs', false, e.target)
-    }
+    },
+    async shareLink() {
+      const { toClipboard } = useClipboard();
+      try {
+        await toClipboard(location.href);
+        this.isShow = true;
+
+        document.querySelector('.alertStyle').style.display = 'block';
+        document.querySelector('.alert-popup').style.display = 'block';
+      } catch (e) {
+        await Promise.reject(e);
+      }
+    },
+    // showShareArea() {
+    //   const shareWrap = document.querySelector('.btn-sns-share-wrap').classList;
+    //   if(Array.from(shareWrap).includes('on')) {
+    //     shareWrap.remove('on');
+    //   } else {
+    //     shareWrap.add('on');
+    //   }
+    // }
   }
 }
 </script>
@@ -278,6 +338,97 @@ element.style {
   background-repeat: no-repeat;
 }
 
+.movie-detail-page .movie-detail-cont .btn-util .sns-share {
+  position: relative;
+  display: inline-block;
+}
+.movie-detail-page .movie-detail-cont .btn-util .btn {
+  display: inline-block;
+  min-width: 100px;
+  height: 36px;
+  line-height: 34px;
+  margin: 0 6px 0 0;
+  padding: 0 10px;
+  font-size: .9333em;
+  color: #fff;
+  text-decoration: none;
+  text-align: center;
+  border: 1px solid #706f72;
+  border-radius: 4px;
+  background-color: transparent;
+}
+.movie-detail-page .movie-detail-cont .btn-util .btn:hover {
+  color: #222;
+  background-color: #fff;
+}
+movie-detail-page .movie-detail-cont .btn-util .btn.on
+.ico-heart-line,.movie-detail-page .movie-detail-cont .btn-util .btn:hover .ico-heart-line {
+  background-image:url(/ico-heart-on.png)
+}
+.movie-detail-page .movie-detail-cont .btn-util .btn .iconset {
+  margin-right: 4px;
+}
+.ico-sns-line {
+  width: 17px;
+  height: 17px;
+  background-image: url(/ico-sns-line.png);
+}
+.movie-detail-page .movie-detail-cont .btn-util .btn:hover .ico-sns-line {
+  background-image: url(/ico-sns-on.png);
+}
+
+.movie-detail-page .movie-detail-cont .btn-util .sns-share .btn-sns-share-wrap {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 54px;
+  z-index: 55;
+  width: 360px;
+  height: 100px;
+  margin: 0 0 0 -180px;
+  padding: 15px 0 0 0;
+  border: 1px solid #d8d9db;
+  border-radius: 5px;
+  background-color: #fff;
+}
+.movie-detail-page .movie-detail-cont .btn-util .sns-share .btn-sns-share-wrap:before {
+  content: '';
+  position: absolute;
+  left: 169px;
+  top: -12px;
+  display: block;
+  width: 22px;
+  height: 12px;
+  background: url(/bg-tooltip-arr-top-script.png) no-repeat 0 0;
+}
+.movie-detail-page .movie-detail-cont .btn-util .sns-share .btn-sns-share-wrap.on {
+  display: block;
+}
+.movie-detail-page .movie-detail-cont .btn-util .sns-share .btn-sns-share-wrap .cont-area {
+  position: relative;
+}
+.btn-sns-share-group {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+.movie-detail-page .movie-detail-cont .btn-util .sns-share .btn-sns-share-wrap .btn {
+  display: inline-block;
+  min-width: 50px;
+  margin: 0 4px;
+  padding: 48px 0 0 0;
+  border: 0;
+  font-size: .9333em;
+  color: #444;
+  line-height: 1.1;
+  background-color: transparent;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+.btn-sns-share-group .btn.link {
+  background-image: url(/btn-sns-share-link.png);
+}
+
 .movie-detail-page .movie-detail-cont .info {
   position: absolute;
   left: 0;
@@ -322,5 +473,25 @@ em {
   width: 1px;
   height: 1px;
   opacity: 0;
+}
+
+.movie-detail-page .movie-detail-cont .info .rate {
+  float: left;
+  padding: 0 0 0 35px;
+}
+.movie-detail-page .movie-detail-cont .info .rate .cont {
+  display: inline-block;
+  min-height: 35px;
+  padding: 0 0 0 30px;
+  vertical-align: middle;
+  line-height: 1.1;
+  background: url(/ico-ticket-gray.png) no-repeat 0 center;
+}
+.movie-detail-page .movie-detail-cont .info .rate .cont em {
+  margin: 0 4px 0 0;
+  color: #fff;
+  font-size: 2.1333em;
+  font-family: Roboto,Dotum,'돋움',sans-serif;
+  font-weight: 400;
 }
 </style>
